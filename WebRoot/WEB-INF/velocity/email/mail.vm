@@ -1,0 +1,5 @@
+<html>    
+<body>    
+	尊敬的老板，您好，你有一个订单未结算，订单号：$!{orderNo},请<a href="http://localhost:8080/">登录</a>销售管理系统结算当前订单！
+</body>    
+</html>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:c="http://www.springframework.org/schema/c" xmlns:cache="http://www.springframework.org/schema/cache" xmlns:context="http://www.springframework.org/schema/context" xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:jee="http://www.springframework.org/schema/jee" xmlns:lang="http://www.springframework.org/schema/lang" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p" xmlns:task="http://www.springframework.org/schema/task" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- 引入项目配置文件 -->
+<!-- 	<context:property-placeholder location="classpath:config.properties" /> -->
+<!-- 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> -->
+<!-- 		<property name="locations"> -->
+<!-- 			<list> -->
+<!-- 				<value>classpath:config.properties</value> -->
+<!-- 				<value>classpath:mail.properties</value>   -->
+<!-- 			</list> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+	<context:property-placeholder location="classpath*:*.properties"/>
+	<!-- 自动扫描repository和service包(自动注入) -->
+	<context:component-scan base-package="light.mvc.dao,light.mvc.service,light.mvc.utils" />
+	
+	<bean id="multipartResolver"    class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="1000000"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+    
+    <!-- 邮件发送开始 -->
+  <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">  
+    <property name="javaMailProperties">  
+      <props>  
+        <prop key="mail.smtp.auth">true</prop>   
+        <prop key="mail.smtp.starttls.enable">true</prop>  
+        <prop key="mail.mime.charset">UTF-8</prop>  
+        <prop key="mail.transport.protocol">smtp</prop>
+        <prop key="mail.smtp.timeout">${mail.smtp.timeout}</prop>  
+      </props>  
+    </property>  
+    <property name="host" value="${Settings.mailserver.host}" />  
+    <property name="username" value="${Settings.mailserver.username}" />  
+    <property name="password" value="${Settings.mailserver.password}" />  
+    <property name="port" value="${Settings.mailserver.port}"/>  
+    <property name="defaultEncoding" value="UTF-8"></property>  
+  </bean>  
+    
+  <bean id="simpleMailMessage" class="org.springframework.mail.SimpleMailMessage" >    
+    <property name="from" value="${Settings.mailtplt.from}" />
+  </bean>    
+    
+  <!-- 用于自己指定vm存放目录 -->  
+  <bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">    
+    <property name="resourceLoaderPath" value="/WEB-INF/velocity/email/"></property>     
+  </bean>  
+       
+  <bean id="mailSenderService" class="light.mvc.service.email.MailSenderService">      
+    <property name="mailSender" ref="mailSender" />    
+    <property name="simpleMailMessage" ref="simpleMailMessage" />    
+    <!-- 如果使用Vilocity -->  
+    <property name="velocityEngine" ref="velocityEngine" />
+    <property name="nickName" value="${mail.nickName}" />   
+  </bean>   
+<!-- 邮件发送结束 -->
+
+</beans>
